@@ -1,0 +1,178 @@
+﻿<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Đặt hàng</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;700&family=Work+Sans:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #f7efe2;
+      --ink: #2b2a28;
+      --accent: #c56b2b;
+      --accent-2: #e3a56d;
+      --panel: #fffaf3;
+      --line: #e7d9c8;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Work Sans", sans-serif;
+      color: var(--ink);
+      background: radial-gradient(1200px 600px at 10% -10%, #fff5e8, transparent 60%),
+                  radial-gradient(900px 500px at 90% 10%, #ffe8cc, transparent 60%),
+                  var(--bg);
+      min-height: 100vh;
+    }
+    header {
+      padding: 40px 20px 10px;
+      text-align: center;
+    }
+    header h1 {
+      font-family: "Fraunces", serif;
+      font-weight: 700;
+      font-size: clamp(28px, 4vw, 44px);
+      margin: 0 0 10px;
+      letter-spacing: 0.5px;
+    }
+    header p { margin: 0; opacity: 0.8; }
+    .wrap {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 20px 40px rgba(43, 42, 40, 0.08);
+    }
+    .grid {
+      display: grid;
+      gap: 20px;
+    }
+    .hero-image {
+      width: 100%;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      background: #f6e6d3;
+    }
+    .hero-image img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+    .label { font-weight: 600; margin-bottom: 8px; display: block; }
+    textarea {
+      width: 100%;
+      min-height: 110px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px 14px;
+      font: inherit;
+      background: #fff;
+    }
+    .row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    button {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #fff;
+      border: none;
+      border-radius: 999px;
+      padding: 12px 22px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.08s ease, box-shadow 0.2s ease;
+      box-shadow: 0 10px 20px rgba(197, 107, 43, 0.25);
+    }
+    button:active { transform: translateY(1px) scale(0.99); }
+    .msg {
+      font-size: 14px;
+      color: #b04a2a;
+      min-height: 18px;
+    }
+    .order {
+      margin-top: 40px;
+      scroll-margin-top: 20px;
+    }
+    .order[hidden] {
+      display: none;
+    }
+    .order h2 {
+      font-family: "Fraunces", serif;
+      margin-top: 0;
+    }
+    .pill {
+      display: inline-block;
+      background: #f1dfc9;
+      color: #6b3b1e;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Nhập địa chỉ giao hàng</h1>
+    <p>Nhập địa chỉ đầy đủ để hoàn tất đơn hàng.</p>
+  </header>
+
+  <main class="wrap">
+    <section class="panel grid" aria-label="Nhập địa chỉ">
+      <div class="hero-image" aria-hidden="true">
+        <img style="size:1px"
+          src="images/dia-chi-giao-hang.jpg"
+          alt="Minh họa địa chỉ giao hàng"
+        />
+      </div>
+      <label class="label" for="address">Địa chỉ giao hàng</label>
+      <textarea id="address" placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành..."></textarea>
+
+      <div class="row">
+        <button id="okBtn" type="button">OK</button>
+        <div id="msg" class="msg" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section id="orderPlaced" class="panel order" aria-label="Đơn hàng đã được đặt" hidden>
+      <span class="pill">Đã đặt</span>
+      <h2>Đơn hàng "Strawberry milktea" đã được đặt</h2>
+      <p><strong>Địa chỉ giao hàng:</strong> <span id="addressPreview">Chưa nhập</span></p>
+      <p>Cảm ơn bạn. Đơn hàng sẽ được xử lý trong ít phút.</p>
+    </section>
+  </main>
+
+  <script>
+    const okBtn = document.getElementById('okBtn');
+    const address = document.getElementById('address');
+    const msg = document.getElementById('msg');
+    const orderPlaced = document.getElementById('orderPlaced');
+    const addressPreview = document.getElementById('addressPreview');
+
+    okBtn.addEventListener('click', () => {
+      const value = address.value.trim();
+      if (!value) {
+        msg.textContent = 'Vui lòng nhập địa chỉ trước khi bấm OK.';
+        address.focus();
+        return;
+      }
+      msg.textContent = '';
+      addressPreview.textContent = value;
+      orderPlaced.hidden = false;
+      orderPlaced.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  </script>
+</body>
+</html>
